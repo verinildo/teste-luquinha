@@ -1,0 +1,499 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Controle Financeiro por Local</title>
+  <link rel="preconnect" href="https://cdn.jsdelivr.net">
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <div class="app-shell">
+    <aside class="sidebar" id="sidebar">
+      <div class="brand">
+        <div class="brand-mark">CF</div>
+        <div>
+          <strong>Controle Financeiro</strong>
+          <span>Entradas e saídas</span>
+        </div>
+      </div>
+
+      <nav class="menu" id="menu">
+        <button class="menu-item active" data-page="dashboard">
+          <span class="menu-icon">▦</span> Visão geral
+        </button>
+
+        <div class="menu-label">Locais</div>
+        <button class="menu-item" data-page="local" data-local="cantina">
+          <span class="dot dot-1"></span> Cantina
+        </button>
+        <button class="menu-item" data-page="local" data-local="lojinha">
+          <span class="dot dot-2"></span> Lojinha
+        </button>
+        <button class="menu-item" data-page="local" data-local="secretaria">
+          <span class="dot dot-3"></span> Secretaria
+        </button>
+        <button class="menu-item" data-page="local" data-local="eventos">
+          <span class="dot dot-4"></span> Eventos
+        </button>
+        <button class="menu-item" data-page="local" data-local="estacionamento">
+          <span class="dot dot-5"></span> Estacionamento
+        </button>
+        <button class="menu-item" data-page="local" data-local="outros">
+          <span class="dot dot-6"></span> Outros
+        </button>
+
+        <div class="menu-label">Ferramentas</div>
+        <button class="menu-item" data-page="reports">
+          <span class="menu-icon">▤</span> Relatórios
+        </button>
+      </nav>
+
+      <div class="sidebar-footer">
+        <button class="ghost-btn full" id="backupBtn">Exportar backup</button>
+        <label class="ghost-btn full file-label">
+          Importar backup
+          <input type="file" id="importFile" accept=".json,application/json" hidden>
+        </label>
+      </div>
+    </aside>
+
+    <main class="main">
+      <header class="topbar">
+        <div class="topbar-title-wrap">
+          <button class="icon-btn mobile-only" id="menuToggle" aria-label="Abrir menu">☰</button>
+          <div>
+            <p class="eyebrow">Gestão financeira</p>
+            <h1 id="pageTitle">Visão geral</h1>
+          </div>
+        </div>
+
+        <button class="primary-btn" id="newTransactionBtn">+ Novo lançamento</button>
+      </header>
+
+      <section class="page active" id="dashboardPage">
+        <div class="summary-grid">
+          <article class="summary-card">
+            <span>Entradas</span>
+            <strong class="positive" id="totalIncome">R$ 0,00</strong>
+            <small>Somando todos os locais</small>
+          </article>
+          <article class="summary-card">
+            <span>Saídas</span>
+            <strong class="negative" id="totalExpense">R$ 0,00</strong>
+            <small>Somando todos os locais</small>
+          </article>
+          <article class="summary-card">
+            <span>Saldo</span>
+            <strong id="totalBalance">R$ 0,00</strong>
+            <small>Entradas menos saídas</small>
+          </article>
+          <article class="summary-card">
+            <span>Lançamentos</span>
+            <strong id="transactionCount">0</strong>
+            <small>Total registrado</small>
+          </article>
+        </div>
+
+        <div class="dashboard-grid">
+          <article class="panel chart-panel">
+            <div class="panel-heading">
+              <div>
+                <h2>Saldo por local</h2>
+                <p>Comparação entre entradas e saídas</p>
+              </div>
+            </div>
+            <div class="chart-wrap">
+              <canvas id="locationChart"></canvas>
+            </div>
+          </article>
+
+          <article class="panel chart-panel">
+            <div class="panel-heading">
+              <div>
+                <h2>Movimentação mensal</h2>
+                <p>Entradas e saídas ao longo do tempo</p>
+              </div>
+            </div>
+            <div class="chart-wrap">
+              <canvas id="monthlyChart"></canvas>
+            </div>
+          </article>
+        </div>
+	<!-- =========================================================
+     GRÁFICOS POR CATEGORIA
+========================================================== -->
+
+<div class="category-section-heading">
+
+  <div>
+    <h2>Visão por categoria</h2>
+
+    <p>
+      O gráfico GERAL consolida GERAL + RESET + RESET Teens.
+    </p>
+  </div>
+
+</div>
+
+
+<div class="category-charts-grid">
+
+  <!-- GERAL -->
+
+  <article class="panel chart-panel">
+
+    <div class="panel-heading">
+
+      <div>
+
+        <h2>GERAL</h2>
+
+        <p>
+          Consolidado de todas as categorias
+        </p>
+
+      </div>
+
+    </div>
+
+
+    <div class="category-chart-wrap">
+
+      <canvas id="generalCategoryChart"></canvas>
+
+    </div>
+
+  </article>
+
+
+
+  <!-- RESET -->
+
+  <article class="panel chart-panel">
+
+    <div class="panel-heading">
+
+      <div>
+
+        <h2>RESET</h2>
+
+        <p>
+          Somente lançamentos RESET
+        </p>
+
+      </div>
+
+    </div>
+
+
+    <div class="category-chart-wrap">
+
+      <canvas id="resetCategoryChart"></canvas>
+
+    </div>
+
+  </article>
+
+
+
+  <!-- RESET TEENS -->
+
+  <article class="panel chart-panel">
+
+    <div class="panel-heading">
+
+      <div>
+
+        <h2>RESET Teens</h2>
+
+        <p>
+          Somente lançamentos RESET Teens
+        </p>
+
+      </div>
+
+    </div>
+
+
+    <div class="category-chart-wrap">
+
+      <canvas id="resetTeensCategoryChart"></canvas>
+
+    </div>
+
+  </article>
+
+</div>
+
+
+
+        <div class="dashboard-grid lower-grid">
+          <article class="panel">
+            <div class="panel-heading">
+              <div>
+                <h2>Resumo dos locais</h2>
+                <p>Clique em um local para abrir os detalhes</p>
+              </div>
+            </div>
+            <div class="locations-summary" id="locationsSummary"></div>
+          </article>
+
+          <article class="panel">
+            <div class="panel-heading">
+              <div>
+                <h2>Últimos lançamentos</h2>
+                <p>Movimentações mais recentes</p>
+              </div>
+            </div>
+            <div class="mini-transactions" id="recentTransactions"></div>
+          </article>
+        </div>
+      </section>
+
+      <section class="page" id="localPage">
+        <div class="local-hero">
+          <div>
+            <span class="local-badge" id="localBadge">Local</span>
+            <h2 id="localHeading">Cantina</h2>
+            <p>Controle individual de entradas, saídas e saldo.</p>
+          </div>
+          <button class="primary-btn" id="localNewTransactionBtn">+ Lançamento neste local</button>
+        </div>
+
+        <div class="summary-grid local-summary-grid">
+          <article class="summary-card">
+            <span>Entradas</span>
+            <strong class="positive" id="localIncome">R$ 0,00</strong>
+          </article>
+          <article class="summary-card">
+            <span>Saídas</span>
+            <strong class="negative" id="localExpense">R$ 0,00</strong>
+          </article>
+          <article class="summary-card">
+            <span>Saldo atual</span>
+            <strong id="localBalance">R$ 0,00</strong>
+          </article>
+          <article class="summary-card">
+            <span>Lançamentos</span>
+            <strong id="localCount">0</strong>
+          </article>
+        </div>
+
+        <article class="panel">
+          <div class="panel-heading responsive-heading">
+            <div>
+              <h2>Movimentações</h2>
+              <p>Histórico completo deste local</p>
+            </div>
+            <div class="table-search">
+              <input type="search" id="localSearch" placeholder="Buscar descrição..." />
+            </div>
+          </div>
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>Data</th>
+                  <th>Descrição</th>
+                  <th>Categoria</th>
+                  <th>Tipo</th>
+                  <th>Valor</th>
+                  <th>Ações</th>
+                </tr>
+              </thead>
+              <tbody id="localTransactionsTable"></tbody>
+            </table>
+          </div>
+        </article>
+      </section>
+
+      <section class="page" id="reportsPage">
+        <article class="panel">
+          <div class="panel-heading">
+            <div>
+              <h2>Gerar relatório</h2>
+              <p>Filtre por período, local e tipo de movimentação.</p>
+            </div>
+          </div>
+
+          <div class="filters-grid">
+            <label>
+              <span>Data inicial</span>
+              <input type="date" id="reportStart">
+            </label>
+            <label>
+              <span>Data final</span>
+              <input type="date" id="reportEnd">
+            </label>
+            <label>
+              <span>Local</span>
+              <select id="reportLocation">
+                <option value="all">Todos os locais</option>
+                <option value="cantina">Cantina</option>
+                <option value="lojinha">Lojinha</option>
+                <option value="secretaria">Secretaria</option>
+                <option value="eventos">Eventos</option>
+                <option value="estacionamento">Estacionamento</option>
+                <option value="outros">Outros</option>
+              </select>
+            </label>
+            <label>
+              <span>Tipo</span>
+              <select id="reportType">
+                <option value="all">Entradas e saídas</option>
+                <option value="entrada">Somente entradas</option>
+                <option value="saida">Somente saídas</option>
+              </select>
+            </label>
+          </div>
+
+          <div class="report-actions">
+            <button class="primary-btn" id="generateReportBtn">Gerar relatório</button>
+            <button class="secondary-btn" id="exportCsvBtn">Exportar CSV</button>
+            <button class="secondary-btn" id="printReportBtn">Imprimir / PDF</button>
+          </div>
+        </article>
+
+        <div class="summary-grid report-summary">
+          <article class="summary-card">
+            <span>Entradas no período</span>
+            <strong class="positive" id="reportIncome">R$ 0,00</strong>
+          </article>
+          <article class="summary-card">
+            <span>Saídas no período</span>
+            <strong class="negative" id="reportExpense">R$ 0,00</strong>
+          </article>
+          <article class="summary-card">
+            <span>Saldo do período</span>
+            <strong id="reportBalance">R$ 0,00</strong>
+          </article>
+          <article class="summary-card">
+            <span>Registros</span>
+            <strong id="reportCount">0</strong>
+          </article>
+        </div>
+
+        <article class="panel report-panel" id="printArea">
+          <div class="report-header">
+            <div>
+              <h2>Relatório financeiro</h2>
+              <p id="reportDescription">Selecione os filtros e clique em “Gerar relatório”.</p>
+            </div>
+            <div class="report-generated-at" id="reportGeneratedAt"></div>
+          </div>
+
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>Data</th>
+                  <th>Local</th>
+                  <th>Descrição</th>
+                  <th>Categoria</th>
+                  <th>Tipo</th>
+                  <th>Valor</th>
+                </tr>
+              </thead>
+              <tbody id="reportTable"></tbody>
+            </table>
+          </div>
+        </article>
+      </section>
+    </main>
+  </div>
+
+  <dialog id="transactionDialog">
+    <form method="dialog" class="modal" id="transactionForm">
+      <div class="modal-header">
+        <div>
+          <span class="eyebrow">Movimentação</span>
+          <h2 id="transactionModalTitle">
+  Novo lançamento
+</h2>
+        </div>
+        <button class="icon-btn" value="cancel" type="button" id="closeModalBtn">×</button>
+      </div>
+
+      <div class="form-grid">
+        <label>
+          <span>Local</span>
+          <select id="transactionLocation" required>
+            <option value="cantina">Cantina</option>
+            <option value="lojinha">Lojinha</option>
+            <option value="secretaria">Secretaria</option>
+            <option value="eventos">Eventos</option>
+            <option value="estacionamento">Estacionamento</option>
+            <option value="outros">Outros</option>
+          </select>
+        </label>
+
+        <label>
+          <span>Tipo</span>
+          <select id="transactionType" required>
+            <option value="entrada">Entrada</option>
+            <option value="saida">Saída</option>
+          </select>
+        </label>
+
+        <label class="full-field">
+          <span>Descrição</span>
+          <input id="transactionDescription" type="text" placeholder="Ex.: Venda de lanches" maxlength="80" required>
+        </label>
+
+<label>
+  <span>Categoria</span>
+
+  <select id="transactionCategory" required>
+    <option value="GERAL">GERAL</option>
+    <option value="RESET">RESET</option>
+    <option value="RESET Teens">RESET Teens</option>
+  </select>
+</label>
+
+        <label>
+          <span>Valor (R$)</span>
+          <input id="transactionValue" type="number" min="0.01" step="0.01" placeholder="0,00" required>
+        </label>
+
+        <label>
+          <span>Data</span>
+          <input id="transactionDate" type="date" required>
+        </label>
+
+        <label>
+          <span>Forma de pagamento</span>
+          <select id="transactionPayment">
+            <option value="Pix">Pix</option>
+            <option value="Dinheiro">Dinheiro</option>
+            <option value="Cartão">Cartão</option>
+            <option value="Transferência">Transferência</option>
+            <option value="Outro">Outro</option>
+          </select>
+        </label>
+
+        <label class="full-field">
+          <span>Observação</span>
+          <textarea id="transactionNotes" rows="3" placeholder="Opcional"></textarea>
+        </label>
+      </div>
+
+      <div class="modal-actions">
+        <button class="secondary-btn" type="button" id="cancelModalBtn">Cancelar</button>
+        <button
+  class="primary-btn"
+  type="submit"
+  id="saveTransactionBtn"
+>
+  Salvar lançamento
+</button>
+      </div>
+    </form>
+  </dialog>
+
+  <div class="toast" id="toast"></div>
+
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.7/dist/chart.umd.min.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
